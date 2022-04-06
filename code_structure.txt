@@ -1,0 +1,73 @@
++ Code structure:
+  (Top->down understanding of the code)
+  #
+  1. Entry point
+      manipulation_main/training/train_stable_baselines.py ->
+      if __name__ == "__main__":
+          args = parser.parse_args()
+          args.func(args)
+      def run(args):
+          // from manipulation_main.utils import run_agent
+          run_agent(task, agent, args.stochastic)
+          // task = DummyVecEnv(...)
+          // from stable_baselines.common.vec_env import DummyVecEnv
+          // https://stable-baselines.readthedocs.io/en/master/guide/vec_envs.html#dummyvecenv
+          task.close()
+  #
+  2. Second point
+      manipulation_main/utils.py import run_agent
+      run_agent(task, agent, stochastic=False, n_episodes=100, debug=False):
+          _run_episode
+          obs = task.reset()
+
+
+  ########################################################################
+  Bottom->up search through the code (starting from the loadSDF function)
+
+  1. First point:loading SDF/URDF
+      manipulation_main/simulation/model.py:            model_id = self._physics_client.loadSDF(path, globalScaling=scaling)[0]
+
+      manipulation_main/simulation/model.py:            model_id = self._physics_client.loadURDF(
+
+      both are inside "def load_model(...)"
+      #
+
+  2. Second point:
+      ./manipulation_main/simulation/simulation.py:        model.load_model(path, start_pos, start_orn, scaling)
+
+      it is inside
+      def add_model(self, path, start_pos, start_orn, scaling=1.):
+
+  3. Third point:
+      3a. Scene loading
+      ./manipulation_main/simulation/scene.py:        self._world.add_model(table_urdf, [0., 0., -.82], [0., 0., 0., 1.])
+
+      ./manipulation_main/simulation/scene.py:            self._world.add_model(path, position, orientation, scaling=scale)
+
+      3b. Robot loading
+      ./manipulation_main/gripperEnv/robot.py:        self._model = self.add_model(self.model_path, start_pos, self._init_ori)
+
+  4a. Fourth point
+
+      ./manipulation_main/simulation/scene.py:
+      class OnTable(BaseScene):
+          """Tabletop settings with geometrically different objects."""
+          def reset(self):
+              ...
+              # Sample random objects
+              n_objects = self._rng.randint(self.min_objects, self.max_objects + 1)
+              urdf_paths, scale = self._object_sampler(n_objects)
+
+              # Spawn objects
+              for path in urdf_paths:
+                  position = np.r_[self._rng.uniform(-self.extent, self.extent, 2), 0.1]
+                  orientation = transform_utils.random_quaternion(self._rng.rand(3))
+                  self._world.add_model(path, position, orientation, scaling=scale)
+                  self._world.run(0.4)
+
+              # Wait for the objects to rest
+              self._world.run(1.)
+
+    5. Fifth point:
+
+      ./manipulation_main/simulation/base_scene.py:        self._object_sampler = object_samplers[config['scene']['data_set']]
