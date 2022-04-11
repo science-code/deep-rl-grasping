@@ -18,8 +18,10 @@ class OnTable(BaseScene):
         self._world.add_model(table_urdf, [0., 0., -.82], [0., 0., 0., 1.])
         self._world.add_model(tray_path, [0, 0.075, -0.19],
                               [0.0, 0.0, 1.0, 0.0], scaling=1.2)
+
         # Sample random objects
-        n_objects = self._rng.randint(self.min_objects, self.max_objects + 1)
+        # n_objects = self._rng.randint(self.min_objects, self.max_objects + 1)
+        n_objects = 1
         urdf_paths, scale = self._object_sampler(n_objects)
 
         # Spawn objects
@@ -37,15 +39,19 @@ class OnFloor(BaseScene):
     def reset(self):
         self.plane_path = 'plane.urdf'
         plane_urdf = os.path.join("models", self.plane_path)
+        # start position, start orientation (quaternions)
         self._world.add_model(plane_urdf, [0., 0., -0.196], [0., 0., 0., 1.])
         # Sample random objects
-        n_objects = self._rng.randint(self.min_objects, self.max_objects + 1)
+        # n_objects = self._rng.randint(self.min_objects, self.max_objects + 1)
+        n_objects = 1
         urdf_paths, scale = self._object_sampler(n_objects)
-        
+
 
         # Spawn objects
         for path in urdf_paths:
-            position = np.r_[self._rng.uniform(-self.extent, self.extent, 2), 0.1]
+            # Position: random inside an uniform range
+            # position = np.r_[self._rng.uniform(-self.extent, self.extent, 2), 0.1]
+            position = np.r_[0, 0, 0.1]
             orientation = transform_utils.random_quaternion(self._rng.rand(3))
             self._world.add_model(path, position, orientation, scaling=scale)
             self._world.run(0.4)
@@ -57,4 +63,3 @@ class OnFloor(BaseScene):
 class OnTableWithBox(BaseScene):
     """Google Q-opt setup."""
     pass
-
