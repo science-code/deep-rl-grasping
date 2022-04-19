@@ -11,10 +11,19 @@ class Model(object):
         if path.endswith('.sdf'):
             model_id = self._physics_client.loadSDF(path, globalScaling=scaling)[0]
             self._physics_client.resetBasePositionAndOrientation(model_id, start_pos, start_orn)
-        else:
+        elif path.endswith('.urdf'):
             model_id = self._physics_client.loadURDF(
                 path, start_pos, start_orn,
-                globalScaling=scaling, useFixedBase=static)        
+                globalScaling=scaling, useFixedBase=static)
+        elif path.endswith('.obj'):
+            model_id = self._physics_client.loadSoftBody(
+                fileName=path,
+                basePosition=[0,0,0],
+                baseOrientation=[0,0,0,1],
+                scale=scaling)
+            # , useFixedBase = static
+        else:
+            print("Unknown model type to load: " + path)
         self.model_id = model_id
         # self._get_limits(self.model_id)
         joints, links = {}, {}
