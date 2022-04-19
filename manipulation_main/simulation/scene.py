@@ -45,7 +45,8 @@ class OnFloor(BaseScene):
         # n_objects = self._rng.randint(self.min_objects, self.max_objects + 1)
         n_objects = 1
         urdf_paths, scale = self._object_sampler(n_objects)
-
+        print("URDF paths: ")
+        print(urdf_paths)
 
         # Spawn objects
         for path in urdf_paths:
