@@ -6,7 +6,7 @@ class Model(object):
     def __init__(self, physics_client):
         self._physics_client = physics_client
 
-    def load_model(self, path, start_pos=[0, 0, 0], 
+    def load_model(self, path, start_pos=[0, 0, 0],
                    start_orn=[0, 0, 0, 1], scaling=1., static=False):
         if path.endswith('.sdf'):
             model_id = self._physics_client.loadSDF(path, globalScaling=scaling)[0]
@@ -14,14 +14,14 @@ class Model(object):
         elif path.endswith('.urdf'):
             model_id = self._physics_client.loadURDF(
                 path, start_pos, start_orn,
-                globalScaling=scaling, useFixedBase=static)
+                globalScaling=scaling,
+                useFixedBase=static)
         elif path.endswith('.obj'):
             model_id = self._physics_client.loadSoftBody(
                 fileName=path,
-                basePosition=[0,0,0],
-                baseOrientation=[0,0,0,1],
+                basePosition=start_pos, # basePosition=[0,0,0],
+                baseOrientation=start_orn, # baseOrientation=[0,0,0,1],
                 scale=scaling)
-            # , useFixedBase = static
         else:
             print("Unknown model type to load: " + path)
         self.model_id = model_id
@@ -36,6 +36,7 @@ class Model(object):
             # link_name = joint_info[12].decode('utf8')
             links[i] = _Link(self._physics_client, self.model_id, i)
         self.joints, self.links = joints, links
+        print(joints, links)
 
         return model_id
 
