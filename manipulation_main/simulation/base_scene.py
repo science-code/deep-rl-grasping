@@ -29,32 +29,28 @@ class BaseScene(ABC):
     # Date: 2022.03.18
     # It returns an array of paths to the objects contained in the object set (dataset)
     def _sample_objects_from_path(self, n_objects,  path):
-        print("\n\nSampling objects from path:")
         dataset_of_filenames = []
-
         dataset_path = "models/" + path
         format_suffix = ".obj"
 
-        print("\nDataset path: {0}".format(dataset_path))
-        total_loaded_files = 0
+        print("\n\nSampling objects from path {0}".format(dataset_path))
 
         # Walk through the directory, and pick the files
         for root, dirs, files in os.walk(dataset_path, topdown=True):  # directory
-            for directory in dirs:
-              print('\nFound: ' + directory + '/')
+            # for directory in dirs:
+            #   print('\nFound: ' + directory + '/')
             for filename in files:
-                print('\nFound: ' + filename)
+                # print('\nFound: ' + filename)
                 if filename.endswith(format_suffix):
                   global_filename = os.path.join(root, filename)
                   dataset_of_filenames.append(global_filename)
                   # increase the counter of loaded files
-                  total_loaded_files += 1
 
-        print("Total object meshes loaded: {0}".format(total_loaded_files))
+        print("Total object meshes loaded: {0}".format(len(dataset_of_filenames)))
         print("Files: ")
         print(dataset_of_filenames)
 
-        # Testing: remove after use (2022.04.11)
+        # Provide only as many objects as requested
         dataset_of_filenames = dataset_of_filenames[0:n_objects]
 
         return dataset_of_filenames, 1.
